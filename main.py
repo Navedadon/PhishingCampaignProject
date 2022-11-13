@@ -44,5 +44,5 @@ def add_attacker_or_target():
 
 
 if __name__ == '__main__':
-    # When we want to create new DB need to use create_database()
+    # create_database() -> When we want to create new DB
     app.run('127.0.0.1', 5000)
