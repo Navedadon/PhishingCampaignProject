@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+
+      <h3>
+         <a href = "{{ url_for('home_screen') }}">Home screen</a>
+      </h3>
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+      <h1> Attackers: </h1>
+      <table>
+         <thead>
+            <tr>
+               <th>Name</th>
+               <th>Email</th>
+               <th>Password</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for attacker in attackers %}
+               <tr>
+                  <td>{{ attacker.name }}</td>
+                  <td>{{ attacker.email }}</td>
+                  <td>{{ attacker.password }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      <h1> Targets: </h1>
+      <table>
+            <thead>
+               <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+               </tr>
+            </thead>
+
+            <tbody>
+               {% for target in targets %}
+                  <tr>
+                     <td>{{ target.name }}</td>
+                     <td>{{ target.email }}</td>
+                  </tr>
+               {% endfor %}
+            </tbody>
+         </table>
+
+   </body>
+</html>
