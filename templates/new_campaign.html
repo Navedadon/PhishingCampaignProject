@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>New campaign</title>
+    <a href = "{{ url_for('home_screen') }}">Home screen</a>
+</head>
+<body>
+    <h2>Add attacker or target</h2>
+    <form action = "{{ request.path }}" method = "post">
+         <label for = "name">Choose template</label><br>
+        <input type="radio" name="template" value="cisco" checked /> Cisco</br>
+        <input type="radio" name="template" value="citrix" checked /> Citrix</br>
+        <input type="radio" name="template" value="domino" checked /> Domino</br>
+        <input type="radio" name="template" value="juinpervpn" checked /> JuinperVPN</br>
+        <input type="radio" name="template" value="office365" checked /> Office365</br>
+        <input type = "submit" value = "Submit" />
+    </form>
+    <hr/>
+</body>
+</html>

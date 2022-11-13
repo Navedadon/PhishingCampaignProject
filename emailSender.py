@@ -2,50 +2,37 @@ import smtplib
 from string import Template
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from DataBase import AttackersInfo, TargetsInfo
+from DataBase import get_all_targets
 
 
-# global variables
-SENDER_ADDRESS = "liadavisror@outlook.com"
-SENDER_PASSWORD = "Liad123Avisror456"
-
-
-def get_targets(filename):
-    TargetsInfo.query.all()
+def extract_target_info(targets_obj_list):
     names = []
     emails = []
-    with open(filename, mode='r', encoding='utf-8') as contacts_file:
-        for a_contact in contacts_file:
-            names.append(a_contact.split()[0])
-            emails.append(a_contact.split()[1])
+    for target in targets_obj_list:
+        names.append(target['name'])
+        emails.append(target['email'])
     return names, emails
 
 
-def read_template(filename):
-    with open(filename, 'r', encoding='utf-8') as template_file:
-        template_file_content = template_file.read()
-    return Template(template_file_content)
-
-
-def send_email(target_list, attacker_list):
+def send_email(attacker, targets_obj_list, template):
     s = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
     s.starttls()
-    s.login(SENDER_ADDRESS, SENDER_PASSWORD)
+    s.login(attacker['email'], attacker['password'])
 
-    names, emails = get_contacts(contacts_filename)
-    message_temp = read_template(temp_filename)
+    names, emails = extract_target_info(targets_obj_list)
+    message_temp = Template(template['body'])
 
     # For each contact, send the email:
     for name, email in zip(names, emails):
         msg = MIMEMultipart()  # create a message
 
         # add in the actual person name to the message template
-        message = message_temp.substitute(PERSON_NAME=name.title())
+        message = message_temp.substitute(PERSON_NAME=name.title(), LINK='www.google.com')
 
         # set up the parameters of the message
-        msg['From'] = SENDER_ADDRESS
+        msg['From'] = attacker['email']
         msg['To'] = email
-        msg['Subject'] = f'Hi {name.title()} need your help!'
+        msg['Subject'] = template['subject']
 
         # add in the message body
         msg.attach(MIMEText(message, 'plain'))

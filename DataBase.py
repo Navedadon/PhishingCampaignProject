@@ -25,7 +25,6 @@ def get_all_targets():
     all_targets_obj = TargetsInfo.query.all()
     for target in all_targets_obj:
         all_targets_list.append({'name': target.name, 'email': target.email})
-    print(all_targets_list)
     return all_targets_list
 
 
@@ -65,7 +64,6 @@ def get_all_attackers():
     all_attacker_obj = AttackersInfo.query.all()
     for attacker in all_attacker_obj:
         all_attacker_list.append({'name': attacker.name, 'email': attacker.email, 'password': attacker.password})
-    print(all_attacker_list)
     return all_attacker_list
 
 
