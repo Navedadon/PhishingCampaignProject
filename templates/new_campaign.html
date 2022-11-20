@@ -6,7 +6,12 @@
     <a href = "{{ url_for('home_screen') }}">Home screen</a>
 </head>
 <body>
-    <h2>Add attacker or target</h2>
+   <h2>Add attacker or target</h2>
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+             <div class = "alert alert-danger">
+                {{ message }}
+             </div>
+          {%- endfor %}
     <form action = "{{ request.path }}" method = "post">
          <label for = "name">Choose template</label><br>
         <input type="radio" name="template" value="cisco" checked /> Cisco</br>

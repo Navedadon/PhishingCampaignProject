@@ -2,7 +2,6 @@ import smtplib
 from string import Template
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from DataBase import get_all_targets
 
 PHISHING_LINK = "http://127.0.0.1:5000/account_login/"
 
@@ -16,11 +15,21 @@ def extract_target_info(targets_obj_list):
     return names, emails
 
 
-def send_email(attacker, targets_obj_list, template, campaign_number):
+def try_send_phishing(attackers_obj_list, targets_obj_list, template, campaign_number):
+    for attacker in attackers_obj_list:
+        try:
+            send_phishing(attacker, targets_obj_list, template, campaign_number)
+            return True
+        except Exception as e:
+            print(f'Problem with attacker: {attacker["email"]}, got exception: {e}')
+            continue
+    return False
+
+
+def send_phishing(attacker, targets_obj_list, template, campaign_number):
     s = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
     s.starttls()
     s.login(attacker['email'], attacker['password'])
-
     names, emails = extract_target_info(targets_obj_list)
     message_temp = Template(template['body'])
 
@@ -29,7 +38,7 @@ def send_email(attacker, targets_obj_list, template, campaign_number):
         msg = MIMEMultipart()  # create a message
 
         # add in the actual person name to the message template
-        message = message_temp.substitute(PERSON_NAME=name.title(), LINK=PHISHING_LINK+str(campaign_number))
+        message = message_temp.substitute(PERSON_NAME=name.title(), LINK=PHISHING_LINK + str(campaign_number))
 
         # set up the parameters of the message
         msg['From'] = attacker['email']

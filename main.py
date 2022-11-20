@@ -8,7 +8,7 @@
 from flask import render_template, request, flash
 from DataBase import *
 from utils import load_email_templates, is_email_valid
-from emailSender import send_email
+from emailSender import try_send_phishing
 
 
 email_templates = load_email_templates()
@@ -52,14 +52,17 @@ def new_campaign():
     if request.method == 'POST':
         template = email_templates[request.form['template']]
         campaign_number = add_new_campaign()
-        send_email(get_all_attackers()[0], get_all_targets(), template, campaign_number)
+        phishing_email_sent = try_send_phishing(get_all_attackers(), get_all_targets(), template, campaign_number)
+        if not phishing_email_sent:
+            flash('Could not start the campaign - check attacker mails')
+            delete_campaign(campaign_number)
     return render_template('new_campaign.html')
 
 
 @app.route('/campaign_data')
 def show_campaign_data():
     return render_template('campaign_data.html',
-                           campaigns=PhishingCampaign.query.all())
+                           campaigns=PhishingCampaign.query.all()[::-1])
 
 
 @app.route('/account_login/<phishing_number>')
@@ -72,6 +75,9 @@ def fall_to_phishing(phishing_number):
 if __name__ == '__main__':
     # create_database() #When we want to create new DB
     # add_target("nave dadon", "navedadon97@gmail.com")
-    # add_attacker("liad avisror", "liadavisror@outlook.com", "Liad123Avisror456")
+    # add_attacker("TheServiceNow", "TheServiceNow@outlook.com", "The123Service456Now789")
+    # add_attacker("TheCustomerServices", "TheCustomerServices@outlook.com", "The12Customer456Services789")
+    # add_attacker("TheMicroServices", "TheMicroServices@outlook.com", "The123Micro456Services789")
     # delete_target("asd")
+    # delete_attacker("liad avisror ")
     app.run('127.0.0.1', 5000)

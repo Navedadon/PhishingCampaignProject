@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import func
-
+from random import shuffle
 
 app = Flask("PhishingCampaign")
 app.secret_key = 'super secret key'
@@ -77,6 +77,7 @@ def get_all_attackers():
     all_attacker_obj = AttackersInfo.query.all()
     for attacker in all_attacker_obj:
         all_attacker_list.append({'name': attacker.name, 'email': attacker.email, 'password': attacker.password})
+    shuffle(all_attacker_list)
     return all_attacker_list
 
 
@@ -101,6 +102,14 @@ def add_new_campaign():
     db.session.add(campaign)
     db.session.commit()
     return campaign.campaign_number
+
+
+def delete_campaign(campaign_number):
+    campaigns = PhishingCampaign.query.filter_by(campaign_number=campaign_number).all()
+    if len(campaigns) == 1:
+        campaign = campaigns[0]
+        db.session.delete(campaign)
+        db.session.commit()
 
 
 def inc_campaign_failed_number(campaign_number):
