@@ -7,10 +7,12 @@
 
 from flask import render_template, request, flash
 from DataBase import *
-from utils import load_email_templates
+from utils import load_email_templates, is_email_valid
 from emailSender import send_email
 
+
 email_templates = load_email_templates()
+
 
 @app.route('/')
 def home_screen():
@@ -33,6 +35,8 @@ def add_attacker_or_target():
         elif request.form['attacker_Target'] == 'attacker' and (
                 not request.form['name'] or not request.form['email'] or not request.form['password']):
             flash('For attacker please fill all fields', 'error')
+        elif not is_email_valid(request.form['email']):
+            flash('Email not valid')
         else:
             if request.form['attacker_Target'] == 'attacker':
                 add_attacker(request.form['name'], request.form['email'], request.form['password'])
@@ -47,10 +51,27 @@ def add_attacker_or_target():
 def new_campaign():
     if request.method == 'POST':
         template = email_templates[request.form['template']]
-        send_email(get_all_attackers()[0], get_all_targets(), template)
+        campaign_number = add_new_campaign()
+        send_email(get_all_attackers()[0], get_all_targets(), template, campaign_number)
     return render_template('new_campaign.html')
 
 
+@app.route('/campaign_data')
+def show_campaign_data():
+    return render_template('campaign_data.html',
+                           campaigns=PhishingCampaign.query.all())
+
+
+@app.route('/account_login/<phishing_number>')
+def fall_to_phishing(phishing_number):
+    print(phishing_number)
+    inc_campaign_failed_number(phishing_number)
+    return render_template("fail_to_phishing.html")
+
+
 if __name__ == '__main__':
-    #  create_database() #When we want to create new DB
+    # create_database() #When we want to create new DB
+    # add_target("nave dadon", "navedadon97@gmail.com")
+    # add_attacker("liad avisror", "liadavisror@outlook.com", "Liad123Avisror456")
+    # delete_target("asd")
     app.run('127.0.0.1', 5000)

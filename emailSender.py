@@ -4,6 +4,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from DataBase import get_all_targets
 
+PHISHING_LINK = "http://127.0.0.1:5000/account_login/"
+
 
 def extract_target_info(targets_obj_list):
     names = []
@@ -14,7 +16,7 @@ def extract_target_info(targets_obj_list):
     return names, emails
 
 
-def send_email(attacker, targets_obj_list, template):
+def send_email(attacker, targets_obj_list, template, campaign_number):
     s = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
     s.starttls()
     s.login(attacker['email'], attacker['password'])
@@ -27,7 +29,7 @@ def send_email(attacker, targets_obj_list, template):
         msg = MIMEMultipart()  # create a message
 
         # add in the actual person name to the message template
-        message = message_temp.substitute(PERSON_NAME=name.title(), LINK='www.google.com')
+        message = message_temp.substitute(PERSON_NAME=name.title(), LINK=PHISHING_LINK+str(campaign_number))
 
         # set up the parameters of the message
         msg['From'] = attacker['email']
