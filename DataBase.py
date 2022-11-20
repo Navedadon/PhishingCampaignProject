@@ -1,7 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import PickleType
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.sql.expression import func
 from random import shuffle
+
+from utils import replace_space_underscore
 
 app = Flask("PhishingCampaign")
 app.secret_key = 'super secret key'
@@ -85,36 +89,43 @@ class PhishingCampaign(db.Model):
     campaign_number = db.Column(db.Integer, primary_key=True)
     passed_number = db.Column(db.Integer)
     failed_number = db.Column(db.Integer)
+    targets_tracer = db.Column(MutableDict.as_mutable(PickleType))
 
-    def __init__(self):
-        campaign_number = 0
-        last_campaign_number = db.session.query(func.max(PhishingCampaign.campaign_number)).scalar()
-        print(last_campaign_number)
-        if last_campaign_number is not None:
-            campaign_number = last_campaign_number + 1
+    def __init__(self, campaign_number, targets_tracer):
         self.campaign_number = campaign_number
-        self.passed_number = 0
+        self.passed_number = len(targets_tracer)
         self.failed_number = 0
+        self.targets_tracer = targets_tracer
 
 
-def add_new_campaign():
-    campaign = PhishingCampaign()
+def add_new_campaign(target_list):
+    campaign_number = 0
+    targets_tracer = {}
+    last_campaign_number = db.session.query(func.max(PhishingCampaign.campaign_number)).scalar()
+    if last_campaign_number is not None:
+        campaign_number = last_campaign_number + 1
+    for target in target_list:
+        targets_tracer[replace_space_underscore(target['name'])] = False
+    campaign = PhishingCampaign(campaign_number, targets_tracer)
     db.session.add(campaign)
     db.session.commit()
     return campaign.campaign_number
 
 
 def delete_campaign(campaign_number):
-    campaigns = PhishingCampaign.query.filter_by(campaign_number=campaign_number).all()
-    if len(campaigns) == 1:
-        campaign = campaigns[0]
-        db.session.delete(campaign)
+    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
+    db.session.delete(campaign)
+    db.session.commit()
+
+
+def inc_campaign_failed_number(campaign_number, target_name):
+    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
+
+    if not campaign.targets_tracer[target_name]:
+        campaign.passed_number -= 1
+        campaign.failed_number += 1
+        campaign.targets_tracer[target_name] = True
         db.session.commit()
 
-
-def inc_campaign_failed_number(campaign_number):
-    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
-    campaign.failed_number += 1
-    db.session.commit()
 
 

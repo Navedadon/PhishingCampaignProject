@@ -51,8 +51,9 @@ def add_attacker_or_target():
 def new_campaign():
     if request.method == 'POST':
         template = email_templates[request.form['template']]
-        campaign_number = add_new_campaign()
-        phishing_email_sent = try_send_phishing(get_all_attackers(), get_all_targets(), template, campaign_number)
+        target_list = get_all_targets()
+        campaign_number = add_new_campaign(target_list)
+        phishing_email_sent = try_send_phishing(get_all_attackers(), target_list, template, campaign_number)
         if not phishing_email_sent:
             flash('Could not start the campaign - check attacker mails')
             delete_campaign(campaign_number)
@@ -65,10 +66,10 @@ def show_campaign_data():
                            campaigns=PhishingCampaign.query.all()[::-1])
 
 
-@app.route('/account_login/<phishing_number>')
-def fall_to_phishing(phishing_number):
-    print(phishing_number)
-    inc_campaign_failed_number(phishing_number)
+@app.route('/account_login:<target_name>/<phishing_number>')
+def fall_to_phishing(phishing_number, target_name):
+    print(target_name)
+    inc_campaign_failed_number(phishing_number, target_name)
     return render_template("fail_to_phishing.html")
 
 

@@ -2,8 +2,8 @@ import smtplib
 from string import Template
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-PHISHING_LINK = "http://127.0.0.1:5000/account_login/"
+from utils import replace_space_underscore
+PHISHING_LINK = "http://127.0.0.1:5000/account_login:"
 
 
 def extract_target_info(targets_obj_list):
@@ -38,7 +38,8 @@ def send_phishing(attacker, targets_obj_list, template, campaign_number):
         msg = MIMEMultipart()  # create a message
 
         # add in the actual person name to the message template
-        message = message_temp.substitute(PERSON_NAME=name.title(), LINK=PHISHING_LINK + str(campaign_number))
+        phishing_link = PHISHING_LINK + replace_space_underscore(name) + "/" + str(campaign_number)
+        message = message_temp.substitute(PERSON_NAME=name.title(), LINK=phishing_link)
 
         # set up the parameters of the message
         msg['From'] = attacker['email']

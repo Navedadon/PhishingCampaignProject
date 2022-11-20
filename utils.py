@@ -10,6 +10,10 @@ def is_email_valid(email):
         return False
 
 
+def replace_space_underscore(string):
+    return string.replace(" ", "_")
+
+
 # Build array of email templates
 def load_email_templates():
     email_templates = {}
