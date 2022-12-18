@@ -1,0 +1,5 @@
+TYPE="Fail"
+
+SUBJECT="You failed the phishing test!"
+
+BODY="$NAME,\nYou failed the phishing test!\nYour company tests you with phishing campaign number $NUMBER.\nThose tests check your awareness of the risk of opening suspicious mail.\nYou are most to be more aware of the risk.\nRemember, when you got a mail when:\n   - The sender is unknown or not from inside the company\n   -The email contains  suspicious links or files\nYou must be more careful and report the mail!"

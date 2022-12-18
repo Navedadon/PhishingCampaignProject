@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import PickleType
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.sql.expression import func
-from random import shuffle
 
 from utils import replace_space_underscore
 
@@ -81,7 +80,6 @@ def get_all_attackers():
     all_attacker_obj = AttackersInfo.query.all()
     for attacker in all_attacker_obj:
         all_attacker_list.append({'name': attacker.name, 'email': attacker.email, 'password': attacker.password})
-    shuffle(all_attacker_list)
     return all_attacker_list
 
 
@@ -90,12 +88,14 @@ class PhishingCampaign(db.Model):
     passed_number = db.Column(db.Integer)
     failed_number = db.Column(db.Integer)
     targets_tracer = db.Column(MutableDict.as_mutable(PickleType))
+    is_alive = db.Column(db.Boolean)
 
     def __init__(self, campaign_number, targets_tracer):
         self.campaign_number = campaign_number
         self.passed_number = len(targets_tracer)
         self.failed_number = 0
         self.targets_tracer = targets_tracer
+        self.is_alive = True
 
 
 def add_new_campaign(target_list):
@@ -121,11 +121,26 @@ def delete_campaign(campaign_number):
 def inc_campaign_failed_number(campaign_number, target_name):
     campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
 
-    if not campaign.targets_tracer[target_name]:
+    if not campaign.targets_tracer[target_name] and campaign.is_alive:
         campaign.passed_number -= 1
         campaign.failed_number += 1
         campaign.targets_tracer[target_name] = True
         db.session.commit()
 
 
+def stop_campaign(campaign_number):
+    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
+    if campaign:
+        campaign.is_alive = False
+        db.session.commit()
+
+
+def get_campaign_state(campaign_number):
+    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
+    return campaign.is_alive
+
+
+def get_campaign_targets_tracer(campaign_number):
+    campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
+    return campaign.targets_tracer
 

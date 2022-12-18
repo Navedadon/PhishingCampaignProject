@@ -3,17 +3,15 @@
 # 5. Improve template - the massage itself, adding pictures and more templates
 # 6. Work on link that can gather data
 # 7. Find how report on spam can be catch by the software
-
+from threading import Timer
 
 from flask import render_template, request, flash, json
 from DataBase import *
 from utils import load_email_templates, is_email_valid
-from emailSender import try_send_phishing
-from flask_cors import CORS, cross_origin
+from emailSender import try_send_phishing, send_result_for_target
 
-
-email_templates = load_email_templates()
-CORS(app, support_credentials=True)
+phishing_email_templates = load_email_templates("phishing_templates")
+response_email_templates = load_email_templates("response_templates")
 
 @app.route('/')
 def home_screen():
@@ -21,7 +19,6 @@ def home_screen():
 
 
 @app.route('/attackers_targets_info')
-@cross_origin(supports_credentials=True)
 def attackers_targets_info():
     attackers = json.dumps(get_all_attackers())
     targets = json.dumps(get_all_targets())
@@ -54,13 +51,17 @@ def add_attacker_or_target():
 @app.route('/new_campaign', methods=['GET', 'POST'])
 def new_campaign():
     if request.method == 'POST':
-        template = email_templates[request.form['template']]
+        template = phishing_email_templates[request.form['template']]
         target_list = get_all_targets()
         campaign_number = add_new_campaign(target_list)
-        phishing_email_sent = try_send_phishing(get_all_attackers(), target_list, template, campaign_number)
+        phishing_email_sent, attacker = try_send_phishing(get_all_attackers(), target_list, template, campaign_number)
         if not phishing_email_sent:
             flash('Could not start the campaign - check attacker mails')
             delete_campaign(campaign_number)
+        else:
+            campaign_time = int(request.form['time']) * 60
+            timer = Timer(campaign_time, end_campaign, args=(campaign_number, attacker, target_list))
+            timer.start()
     return render_template('new_campaign.html')
 
 
@@ -72,12 +73,18 @@ def show_campaign_data():
 
 @app.route('/account_login:<target_name>/<phishing_number>')
 def fall_to_phishing(phishing_number, target_name):
-    print(target_name)
     inc_campaign_failed_number(phishing_number, target_name)
     return render_template("fail_to_phishing.html")
 
 
+def end_campaign(campaign_number, attacker, target_list):
+    with app.app_context():
+        stop_campaign(campaign_number)
+        send_result_for_target(attacker, target_list, campaign_number, response_email_templates["pass"],  response_email_templates["fail"])
+
+
 if __name__ == '__main__':
+
     # create_database() #When we want to create new DB
     # add_target("nave dadon", "navedadon97@gmail.com")
     # add_attacker("TheServiceNow", "TheServiceNow@outlook.com", "The123Service456Now789")

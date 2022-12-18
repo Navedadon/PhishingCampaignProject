@@ -15,6 +15,7 @@
       <table>
          <thead>
             <tr>
+                <th>Alive</th>
                <th>campaign number</th>
                <th>passed_number</th>
                <th>failed_number</th>
@@ -24,6 +25,7 @@
          <tbody>
             {% for campaign in campaigns %}
                <tr>
+                   <td>{{ campaign.is_alive }}</td>
                   <td>{{ campaign.campaign_number }}</td>
                   <td>{{ campaign.passed_number }}</td>
                   <td>{{ campaign.failed_number }}</td>

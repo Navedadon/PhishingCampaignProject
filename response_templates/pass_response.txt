@@ -1,0 +1,5 @@
+TYPE="Pass"
+
+SUBJECT="You passed the phishing test!"
+
+BODY="$NAME,\nYou passed the phishing test!\nYour company tests you with phishing campaign number $NUMBER.\nThose tests check your awareness of the risk of opening suspicious mail.\nKeep doing your great job!\nAlways report suspicious mail. Better carefully than sorry."

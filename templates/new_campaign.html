@@ -6,7 +6,7 @@
     <a href = "{{ url_for('home_screen') }}">Home screen</a>
 </head>
 <body>
-   <h2>Add attacker or target</h2>
+   <h2>New campaign</h2>
     {%- for category, message in get_flashed_messages(with_categories = true) %}
              <div class = "alert alert-danger">
                 {{ message }}
@@ -17,8 +17,10 @@
         <input type="radio" name="template" value="cisco" checked /> Cisco</br>
         <input type="radio" name="template" value="citrix" checked /> Citrix</br>
         <input type="radio" name="template" value="domino" checked /> Domino</br>
-        <input type="radio" name="template" value="juinpervpn" checked /> JuinperVPN</br>
+        <input type="radio" name="template" value="junipervpn" checked /> JuinperVPN</br>
         <input type="radio" name="template" value="office365" checked /> Office365</br>
+        <label for="time">Time (in minutes): </label>
+        <input type="number" value="5" id="time" name="time" min="1"></br>
         <input type = "submit" value = "Submit" />
     </form>
     <hr/>

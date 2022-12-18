@@ -15,11 +15,12 @@ def replace_space_underscore(string):
 
 
 # Build array of email templates
-def load_email_templates():
+def load_email_templates(folder_path):
     email_templates = {}
+    file_path_prefix = folder_path + "/"
     # loop over each email template
-    for f in os.listdir("phishing_templates"):
-        template_file = os.path.join("phishing_templates/", f)
+    for f in os.listdir(folder_path):
+        template_file = os.path.join(file_path_prefix, f)
 
         if os.path.isfile(template_file):
             # read in the template SUBJECT, TYPE, and BODY
