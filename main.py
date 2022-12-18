@@ -5,14 +5,15 @@
 # 7. Find how report on spam can be catch by the software
 
 
-from flask import render_template, request, flash
+from flask import render_template, request, flash, json
 from DataBase import *
 from utils import load_email_templates, is_email_valid
 from emailSender import try_send_phishing
+from flask_cors import CORS, cross_origin
 
 
 email_templates = load_email_templates()
-
+CORS(app, support_credentials=True)
 
 @app.route('/')
 def home_screen():
@@ -20,10 +21,13 @@ def home_screen():
 
 
 @app.route('/attackers_targets_info')
+@cross_origin(supports_credentials=True)
 def attackers_targets_info():
-    return render_template('attackers_targets_info.html',
-                           attackers=AttackersInfo.query.all(),
-                           targets=TargetsInfo.query.all())
+    attackers = json.dumps(get_all_attackers())
+    targets = json.dumps(get_all_targets())
+    return {'attackers': attackers,
+            'targets': targets 
+    }
 
 
 @app.route('/add_attacker_or_target', methods=['GET', 'POST'])
