@@ -112,7 +112,7 @@ def add_new_campaign(target_list):
     last_campaign_number = db.session.query(func.max(PhishingCampaign.campaign_number)).scalar()
     if last_campaign_number is not None:
         campaign_number = last_campaign_number + 1
-    for target in target_list:
+    for target in target_list:  # make a target list the trace who already enter the link
         targets_tracer[replace_space_underscore(target['name'])] = False
     campaign = PhishingCampaign(campaign_number, targets_tracer)
     db.session.add(campaign)
@@ -129,6 +129,7 @@ def delete_campaign(campaign_number):
 def inc_campaign_failed_number(campaign_number, target_name):
     campaign = PhishingCampaign.query.filter_by(campaign_number=campaign_number).first()
 
+    # we will update only if campaign is alive and target not already enter the link
     if not campaign.targets_tracer[target_name] and campaign.is_alive:
         campaign.passed_number -= 1
         campaign.failed_number += 1

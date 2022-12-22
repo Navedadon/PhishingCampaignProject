@@ -2,10 +2,8 @@ import os
 import re
 
 
+# Function that check email validation by regular expressions
 def is_email_valid(email, attacker):
-    print(attacker)
-    print(email)
-    print("@outlook" in email.lower())
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     if re.fullmatch(regex, email):
         if attacker and "@outlook" not in email.lower():
