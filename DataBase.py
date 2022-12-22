@@ -97,12 +97,14 @@ class PhishingCampaign(db.Model):
         self.targets_tracer = targets_tracer
         self.is_alive = True
 
+
 def get_all_campaigns():
     all_campaigns_list = []
     all_campaigns_obj = PhishingCampaign.query.all()[::-1]
     for campaign in all_campaigns_obj:
         all_campaigns_list.append({'campaign_number': campaign.campaign_number, 'passed_number': campaign.passed_number, 'failed_number': campaign.failed_number, 'is_alive': str(campaign.is_alive)})
     return all_campaigns_list
+
 
 def add_new_campaign(target_list):
     campaign_number = 0

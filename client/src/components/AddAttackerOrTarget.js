@@ -45,6 +45,7 @@ function AddAttackerOrTarget() {
                 <label for = "name">Name</label>
                 <input type = "text" name = "name" placeholder = "Name" value={name} onChange={e => setName(e.target.value)}/>
                 <label for = "email">Email</label>
+                {type === 'target' ? null : <label For="email">(must be outlook)</label>}
                 <input type = "text" name = "email" placeholder = "email" value={email} onChange={e => setEmail(e.target.value)}/>
                 {type === 'target' ? null :
                 <div className="inputs">
