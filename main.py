@@ -15,16 +15,13 @@ response_email_templates = load_email_templates("response_templates")
 
 @app.route('/')
 def home_screen():
-    return render_template("home_screen.html")
-
+    return
 
 @app.route('/attackers_targets_info')
 def attackers_targets_info():
     attackers = json.dumps(get_all_attackers())
     targets = json.dumps(get_all_targets())
-    return {'attackers': attackers,
-            'targets': targets 
-    }
+    return { 'attackers': attackers, 'targets': targets }, 200
 
 
 @app.route('/add_attacker_or_target', methods=['POST'])
@@ -48,28 +45,41 @@ def add_attacker_or_target():
                 add_target(name, email)
                 return { 'status': 200, 'message': 'Target was successfully added' }, 200
 
+@app.route('/remove_attacker_or_target', methods=['POST'])
+def remove_attacker_or_target():
+    if request.method == 'POST':
+        name = request.json['name']
+        type = request.json['type']
+        if type == 'attacker':
+            delete_attacker(name)
+        else:
+            delete_target(name)
+        attackers = json.dumps(get_all_attackers())
+        targets = json.dumps(get_all_targets())
+        return { 'attackers': attackers, 'targets': targets }, 200
 
-@app.route('/new_campaign', methods=['GET', 'POST'])
+@app.route('/new_campaign', methods=['POST'])
 def new_campaign():
     if request.method == 'POST':
-        template = phishing_email_templates[request.form['template']]
+        temp = request.json['template']
+        template = phishing_email_templates[temp]
         target_list = get_all_targets()
         campaign_number = add_new_campaign(target_list)
         phishing_email_sent, attacker = try_send_phishing(get_all_attackers(), target_list, template, campaign_number)
         if not phishing_email_sent:
-            flash('Could not start the campaign - check attacker mails')
             delete_campaign(campaign_number)
+            return { 'status': 400, 'message': 'Could not start the campaign - check attacker mails' }, 400
         else:
-            campaign_time = int(request.form['time']) * 60
+            time = request.json['time']
+            campaign_time = int(time) * 60
             timer = Timer(campaign_time, end_campaign, args=(campaign_number, attacker, target_list))
             timer.start()
-    return render_template('new_campaign.html')
+            return { 'status': 200, 'message': temp+' campagin added successfully' }, 200
 
 
 @app.route('/campaign_data')
 def show_campaign_data():
-    return render_template('campaign_data.html',
-                           campaigns=PhishingCampaign.query.all()[::-1])
+    return { 'campaigns': json.dumps(get_all_campaigns()) }
 
 
 @app.route('/account_login:<target_name>/<phishing_number>')

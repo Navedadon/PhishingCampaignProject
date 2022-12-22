@@ -100,3 +100,8 @@ form {
   flex-direction: row;
   align-items: center;
 }
+
+.no-campaign, .no-attackers, .no-targets {
+  font-size: 20px;
+  color: rgb(124, 76, 206);
+}

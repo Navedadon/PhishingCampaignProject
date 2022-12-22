@@ -8,34 +8,56 @@ function AttackersTargetsTable() {
    useEffect(() => {
       fetch('/attackers_targets_info').then(response => {
          if(response.ok) return response.json()
-      }).then(data => {setAttackers(JSON.parse(data.attackers)); setTargets(JSON.parse(data.targets))})
+      }).then(data => {
+         setAttackers(JSON.parse(data.attackers)); 
+         setTargets(JSON.parse(data.targets));
+      })
    },[])
+
+   function handleRemove(event, type, info){
+      event.preventDefault();
+        const reqOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify( { type: type, name: info } )
+        };
+      fetch('/remove_attacker_or_target', reqOptions)
+          .then(response => response.json())
+          .then(data => {
+            setAttackers(JSON.parse(data.attackers)); 
+            setTargets(JSON.parse(data.targets));
+        });
+   }
 
   return (
     <div className="table">
       <h2> Attackers </h2>
-      <table>
-         <thead>
-            <tr>
-               <th>Name</th>
-               <th>Email</th>
-               <th>Password</th>
-            </tr>
-         </thead>
-
-         <tbody>
-            {attackers.map((attacker) => 
+      {attackers.length !== 0 ? <div>
+         <table>
+            <thead>
                <tr>
-                  <td>{attacker.name}</td>
-                  <td>{attacker.email}</td>
-                  <td>{attacker.password}</td>
-               </tr>)}
-         </tbody>
-      </table>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Email</th>
+               </tr>
+            </thead>
+
+            <tbody>
+               {attackers.map((attacker) => 
+                  <tr>
+                     <td><button onClick={event => handleRemove(event, 'attacker', attacker.name)}>-</button></td>
+                     <td>{attacker.name}</td>
+                     <td>{attacker.email}</td>
+                  </tr>)}
+            </tbody>
+         </table>
+      </div> : <p className='no-attackers'>No campaigns currently</p>}
       <h2> Targets </h2>
+      {targets.length !== 0 ? <div>
       <table>
             <thead>
                <tr>
+                  <th></th>
                   <th>Name</th>
                   <th>Email</th>
                </tr>
@@ -44,11 +66,13 @@ function AttackersTargetsTable() {
             <tbody>
                {targets.map((target)=>
                   <tr>
+                     <td><button onClick={event => handleRemove(event, 'target', target.name)}>-</button></td>
                      <td>{target.name}</td>
                      <td>{target.email}</td>
                   </tr>)}
             </tbody>
          </table>
+         </div> : <p className='no-targets'>No campaigns currently</p>}
       </div>
   );
 }
