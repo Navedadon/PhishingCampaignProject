@@ -27,25 +27,26 @@ def attackers_targets_info():
     }
 
 
-@app.route('/add_attacker_or_target', methods=['GET', 'POST'])
+@app.route('/add_attacker_or_target', methods=['POST'])
 def add_attacker_or_target():
     if request.method == 'POST':
-        if request.form['attacker_Target'] == 'target' and (
-                not request.form['name'] or not request.form['email'] or request.form['password']):
-            flash('For target please fill the name and email', 'error')
-        elif request.form['attacker_Target'] == 'attacker' and (
-                not request.form['name'] or not request.form['email'] or not request.form['password']):
-            flash('For attacker please fill all fields', 'error')
-        elif not is_email_valid(request.form['email']):
-            flash('Email not valid')
+        type = request.json['type']
+        name = request.json['name']
+        email = request.json['email']
+        password = request.json['password']
+        if type == 'target' and (not name or not email):
+            return { 'status': 400, 'message': 'For target please fill the name and email' }, 400
+        elif type == 'attacker' and (not name or not email or not password):
+            return { 'status': 400, 'message': 'For attacker please fill all fields' }, 400
+        elif not is_email_valid(email):
+            return { 'status': 400, 'message': 'Email not valid' }, 400
         else:
-            if request.form['attacker_Target'] == 'attacker':
-                add_attacker(request.form['name'], request.form['email'], request.form['password'])
-                flash('Attacker was successfully added')
+            if type == 'attacker':
+                add_attacker(name, email, password)
+                return { 'status': 200, 'message': 'Attacker was successfully added' }, 200
             else:
-                add_target(request.form['name'], request.form['email'])
-                flash('Target was successfully added')
-    return render_template('add_attacker_or_target.html')
+                add_target(name, email)
+                return { 'status': 200, 'message': 'Target was successfully added' }, 200
 
 
 @app.route('/new_campaign', methods=['GET', 'POST'])
