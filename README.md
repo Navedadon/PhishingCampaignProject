@@ -12,3 +12,8 @@ After node.js and python are installed, follow the next steps:
 2) In the PhishingCapaignProject folder, enter the client folder and run "npm install" to install frontend packages
 3) In the PhishingCapaignProject folder, run "pip install -r requirements.txt" to install all backend packages
 4) From the PhishingCapaignProject folder, run "python main.py" to run the project
+
+
+
+Wrote by: Tsipi Barel, Shahar Gur and Nave Dadon
+Mentor: Doron Ofek
