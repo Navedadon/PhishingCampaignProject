@@ -116,9 +116,8 @@ if __name__ == '__main__':
 
     # When we want to create new DB
     # create_database()
-    # add_target("nave dadon", "navedadon97@gmail.com")
     # add_attacker("TheServiceNow", "TheServiceNow@outlook.com", "The123Service456Now789")
-
+    # add_attacker("ServiceWithYou", "ServiceWithYou@outlook.com", "Service123With456You789")
     # New thread to run the sever
     serverRunner = threading.Thread(target=run_server, args=())
     serverRunner.start()
