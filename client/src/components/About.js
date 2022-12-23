@@ -13,9 +13,9 @@ function About() {
 
         <h3>Product description, characterization and scenarios</h3>
         A website that will be a source of information and management for the phishing campaign.
-        The website will allow the campaign managers to send email messages simulating an attack to employees from pre-prepared templates or
-        from custom templates. The sending will be done according to the campaign manager's request.
-        When an employee fails or succeeds in the phishing exercise, you will send him an appropriate message.
+        The website will allow the campaign managers to send email messages simulating an attack to employees from pre-prepared templates.
+        The sending will be done according to the campaign manager's request.
+        When an employee fails or succeeds in the phishing exercise, you will send him an appropriate message after the campaign is done.
         In addition, the site will include data on the exercise - the number of employees who succeeded or failed in the exercise, statistics, etc.
         <h5>by Nave Dadon, Tsipi Barel and Shahar Gur.</h5>
         </p>
