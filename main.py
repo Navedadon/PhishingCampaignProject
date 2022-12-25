@@ -73,8 +73,13 @@ def new_campaign():
         temp = request.json['template']
         template = phishing_email_templates[temp]
         target_list = get_all_targets()
+        attacker_list = get_all_attackers()
+
+        if not target_list or not attacker_list:
+            return {'status': 400, 'message': 'Could not start the campaign - need at least one target and one attacker'}, 400
+
         campaign_number = add_new_campaign(target_list)
-        phishing_email_sent, attacker = try_send_phishing(get_all_attackers(), target_list, template, campaign_number)
+        phishing_email_sent, attacker = try_send_phishing(attacker_list, target_list, template, campaign_number)
 
         # check if the phishing campaign failed, and if so remove it from the DB
         if not phishing_email_sent:
