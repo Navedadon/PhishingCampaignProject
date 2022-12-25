@@ -91,7 +91,7 @@ def new_campaign():
             campaign_time = int(time) * 60
             timer = Timer(campaign_time, end_campaign, args=(campaign_number, attacker, target_list))
             timer.start()
-            return { 'status': 200, 'message': temp+' campagin added successfully' }, 200
+            return { 'status': 200, 'message': temp+' campaign added successfully' }, 200
 
 
 @app.route('/campaign_data')
